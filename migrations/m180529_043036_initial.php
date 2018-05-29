@@ -37,7 +37,7 @@ class m180529_043036_initial extends Migration
         $this->createTable('Taxonomy', [
             'id' => $this->primaryKey(),
             'idParent' => $this->integer(),
-            'slug' => $this->integer(),
+            'slug' => $this->string(500),
             'type' => $this->integer(),
             'title' => $this->string(500),
             'description' => $this->text()
@@ -61,6 +61,30 @@ class m180529_043036_initial extends Migration
         $this->addPrimaryKey('ProductTaxonomy_pk',
                                 'ProductTaxonomy',
                                 ['idTaxonomy','idProduct']);
+
+        $this->createTable('Cart', [
+            'id' => $this->primaryKey(),
+            'hash' => $this->string(32),
+            'created' => $this->timestamp(),
+            'total' => $this->decimal(10, 2)
+        ]);
+
+        $this->createTable('CartItem', [
+            'id' => $this->primaryKey(),
+            'idCart' => $this->integer(),
+            'idProduct' => $this->integer(),
+            'amount' => $this->decimal(10, 3)
+        ]);
+
+        $this->createTable('CartItemAttribute', [
+            'idCartItem' => $this->integer(),
+            'idAttribute' => $this->integer(),
+            'attributeValue' => $this->string(1000)
+        ]);
+
+        $this->addPrimaryKey('CartItemAttribute_PK', 'CartItemAttribute',
+                             ['idCartItem', 'idAttribute']
+                             );
 
         // Create taxonomy
         $this->insert('TaxonomyType', ['id' => 1, 'name' => 'Category']);
@@ -111,6 +135,9 @@ class m180529_043036_initial extends Migration
         $this->dropTable('Product');
         $this->dropTable('Brand');
         $this->dropTable('Email');
+        $this->dropTable('Cart');
+        $this->dropTable('CartItem');
+        $this->dropTable('CartItemAttribute');
         $this->dropTable('User');
         return true;
     }
