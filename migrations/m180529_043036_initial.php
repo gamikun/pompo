@@ -86,6 +86,35 @@ class m180529_043036_initial extends Migration
                              ['idCartItem', 'idAttribute']
                              );
 
+        $this->createTable('Shop', [
+            'id' => $this->primaryKey(),
+            'slug' => $this->string(500),
+            'title' => $this->string(500),
+            'domain' => $this->string(500),
+            'logo' => $this->string(500),
+            'created' => $this->datetime()
+        ]);
+
+        // type:
+        //   1. discount in %
+        //   2. more for less (3x2, 2x1)
+        //   3. fixed discount ($100)
+        //   4. ...
+        $this->createTable('Offer', [
+            'id' => $this->primaryKey(),
+            'slug' => $this->string(500),
+            'type' => $this->integer(),
+            'begins' => $this->datetime(),
+            'ends' => $this->datetime(),
+            'factor' => $this->string(500) // 2x1, 50%
+        ]);
+        $this->createTable('OfferTarget', [
+            'id' => $this->primaryKey(),
+            'idOffer' => $this->integer(),
+            'idTaxonomy' => $this->integer(),
+            'idProduct' => $this->integer()
+        ]);
+
         // Create taxonomy
         $this->insert('TaxonomyType', ['id' => 1, 'name' => 'Category']);
 
@@ -122,6 +151,12 @@ class m180529_043036_initial extends Migration
             [1, 3], // DELL is Laptop
             [2, 3], // MacBook is Laptop
         ]);
+
+        // Default shop
+        $this->insert('Shop', [
+            'id' => 1,
+            'title' => 'The RAM Sellre'
+        ]);
     }
 
     /**
@@ -132,12 +167,15 @@ class m180529_043036_initial extends Migration
         $this->dropTable('ProductTaxonomy');
         $this->dropTable('TaxonomyType');
         $this->dropTable('Taxonomy');
+        $this->dropTable('Shop');
         $this->dropTable('Product');
         $this->dropTable('Brand');
         $this->dropTable('Email');
         $this->dropTable('Cart');
         $this->dropTable('CartItem');
         $this->dropTable('CartItemAttribute');
+        $this->dropTable('OfferTarget');
+        $this->dropTable('Offer');
         $this->dropTable('User');
         return true;
     }
